@@ -33,35 +33,47 @@ import math
 def reward_function(params):
     # get the input variable
     global reward
-    all_wheels_on_track = params[all_wheels_on_track]
-    x = data[x]
-    y = data[y]
-    closest_objects = params[closest_objects]
-    closest_waypoints = params[closest_waypoints]
-    distance_from_center = params[distance_from_center]
-    is_crashed = params[is_crashed]
-    is_left_of_center = params[is_left_of_center]
-    is_offtrack = params[is_offtrack]
-    is_offtrack = params[is_offtrack]
-    heading = params[heading]
-    objects_distance = params[objects_distance]
-    objects_distance = params[objects_distance]
-    objects_left_of_center = params[objects_left_of_center]
-    objects_location = params[objects_location]
-    objects_speed = params[objects_speed]
-    progress = params[progress]
-    speed = params[speed]
-    steering_angle = params[steering_angle]
-    steps = params[steps]
-    track_length = params[track_length]
-    track_width = params[track_width]
-    waypoints = params[waypoints]
+    all_wheels_on_track = params['all_wheels_on_track']
+    x = data['x']
+    y = data['y']
+    closest_objects = params['closest_objects']
+    closest_waypoints = params['closest_waypoints']
+    distance_from_center = params['distance_from_center']
+    is_crashed = params['is_crashed']
+    is_left_of_center = params['is_left_of_center']
+    is_offtrack = params['is_offtrack']
+    is_reversed = params[is_reversed]
+    heading = params['heading']
+    objects_distance = params['objects_distance']
+    objects_distance = params['objects_distance']
+    objects_left_of_center = params['objects_left_of_center']
+    objects_location = params['objects_location']
+    objects_speed = params['objects_speed']
+    progress = params['progress']
+    speed = params['speed']
+    steering_angle = params['steering_angle']
+    steps = params['steps']
+    track_length = params['track_length']
+    track_width = params['track_width']
+    waypoints = params['waypoints']
+    # Calculate the direction of the centerline based on the closest waypoints
+    next_point = waypoints[closest_waypoints[1]]
+    prev_point = waypoints[closest_waypoints[0]]
 
     # def the marker
     marker_1 = track_width * 0.1
     marker_2 = track_width * 0.25
     marker_3 = track_width * 0.5
     SPEED_THESEHOLD = 1.0
+    # Calculate the direction in radius, arctan2(dy, dx), the result is (-pi, pi) in radians
+    track_direction = math.atan2(
+        next_point[1] - prev_point[1], next_point[0] - prev_point[0])
+    # Convert to degree
+    track_direction = math.degrees(track_direction)
+    # Calculate the difference between the track direction and the heading direction of the car
+    direction_diff = abs(track_direction - heading)
+    if direction_diff > 180:
+        direction_diff = 360 - direction_diff
 
     # reward
     if not all_wheels_on_track:
@@ -77,11 +89,11 @@ def reward_function(params):
     elif is_offtrack:
         reward = + 1e-3
     elif is_reversed:
-        reward =+ 1e-3
+        reward = + 1e-3
     elif is_crashed:
         reward = 0.0
-    elif progress<90:
-        reward =+ 1e-3
+    elif progress < 90:
+        reward = + 1e-3
     else:
         reward = + 1
 
